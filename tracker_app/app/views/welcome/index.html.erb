@@ -1,0 +1,50 @@
+<div class="accordion accordion-flush" id="accordionExample">
+  <% Rails.cache.instance_variable_get(:@data).keys.map { |key| JSON.parse(Rails.cache.fetch(key)).merge(time: key) }.reverse.each do |error| %>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="heading<%= error[:time].to_i %>">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#body<%= error[:time].to_i %>">
+          <%= error["message"] %>
+        </button>
+      </h2>
+      <div id="body<%= error[:time].to_i %>" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+
+          <div class="card border-primary mb-3">
+            <div class="card-header">Info</div>
+            <div class="card-body text-primary">
+              <p class="card-text">
+                <strong>Method</strong> <%= error["method"] %><br>
+                <strong>URI</strong> <%= error["uri"] %><br>
+                <strong>Time</strong> <%= Time.at(error[:time].to_i / 1000) %>
+              </p>
+            </div>
+          </div>
+
+          <div class="card border-primary mb-3">
+            <div class="card-header">Backtrace</div>
+            <div class="card-body text-primary">
+              <p class="card-text">
+                <pre><%= raw error["backtrace"].split("\n").join("<br>") %></pre>
+              </p>
+            </div>
+          </div>
+
+          <div class="card border-primary mb-3">
+            <div class="card-header">
+              Source Location:
+              <%= error["backtrace"].split("\n").first %>
+            </div>
+            <div class="card-body text-primary">
+              <p class="card-text">
+                <pre><%= error["source_location"] %></pre>
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  <% end %>
+</div>
